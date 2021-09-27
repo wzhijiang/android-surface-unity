@@ -1,6 +1,6 @@
 {
     "name": "io.github.wzhijiang.android.surface",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "displayName": "io.github.wzhijiang.android.surface",
     "description": "Display android view contents with android surface.",
     "unity": "2019.4",
