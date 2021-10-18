@@ -28,5 +28,18 @@ namespace Igw.Android
         {
             return CurrentActivity.Call<AndroidJavaObject>("getMainLooper");
         }
+
+        private static UnityPlayer s_UnityPlayer;
+        public static UnityPlayer UnityPlayer
+        {
+            get
+            { 
+                if (s_UnityPlayer == null)
+                {
+                    s_UnityPlayer = new UnityPlayer(CurrentActivity.Get<AndroidJavaObject>("mUnityPlayer"));
+                }
+                return s_UnityPlayer;
+            }
+        }
     }
 }

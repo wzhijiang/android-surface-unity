@@ -6,17 +6,34 @@ namespace Igw.Android
 {
     public class SimpleWebView
     {
+        private static AndroidJavaClass s_JavaClass;
+        public static AndroidJavaClass JavaClass
+        {
+            get
+            {
+                if (s_JavaClass == null)
+                {
+                    s_JavaClass = new AndroidJavaClass("io.github.wzhijiang.android.surface.SimpleWebView");
+                }
+                return s_JavaClass;
+            }
+        }
+
         private AndroidJavaObject m_JavaObject;
         public AndroidJavaObject JavaObject
         {
             get { return m_JavaObject; }
         }
 
-        public SimpleWebView(AndroidJavaObject jContext, int width, int height)
+        private int m_Width;
+        private int m_Height;
+
+        public SimpleWebView(AndroidJavaObject jContext, AndroidJavaObject parent, int width, int height)
         {
-            m_JavaObject = new AndroidJavaObject("io.github.wzhijiang.android.surface.SimpleWebView", jContext);
-            m_JavaObject.Call("layout", 0, 0, width, height);
-            m_JavaObject.Call("initSettings");
+            m_Width = width;
+            m_Height = height;
+
+            m_JavaObject = JavaClass.CallStatic<AndroidJavaObject>("create", jContext, parent, width, height, 0);
         }
 
         public void LoadUrl(string url)
@@ -29,9 +46,19 @@ namespace Igw.Android
             m_JavaObject.Call("setSurface", jSurface);
         }
 
-        public void DrawSurface()
+        public bool DispatchTouchEvent(int x, int y, int action)
         {
-            m_JavaObject.Call("drawSurface");
+            return m_JavaObject.Call<bool>("dispatchTouchEvent", x, y, action);
+        }
+
+        public int GetWidth()
+        {
+            return m_Width;
+        }
+
+        public int GetHeight()
+        {
+            return m_Height;
         }
     }
 }
