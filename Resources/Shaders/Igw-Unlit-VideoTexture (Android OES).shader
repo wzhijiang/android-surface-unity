@@ -59,17 +59,21 @@
 
             void main()
             {
-	    #if defined(SHADER_API_GLES) || defined(SHADER_API_GLES3)
+            #if defined(SHADER_API_GLES) || defined(SHADER_API_GLES3)
                 vec4 col = texture2D(_MainTex, texVal.xy);
-		
-		// If color space is Linear, the line below is required.
+
+            #if defined(UNITY_COLORSPACE_GAMMA)
+                
+            #else
+                // If color space is Linear, the line below is required.
                 col.xyz = gammaToLinear(col.xyz);
-		
+            #endif // defined(UNITY_COLORSPACE_GAMMA)
+
                 gl_FragColor = col;
-	    #else
+            #else
                 gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
-	    #endif
-                }
+            #endif
+            }
             #endif
 
             ENDGLSL

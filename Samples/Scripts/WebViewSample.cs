@@ -37,7 +37,7 @@ namespace Igw.Samples
             {
                 m_WebView = new SimpleWebView(Activity.CurrentActivity, Activity.UnityPlayer.JavaObject, 1920, 1080);
                 m_WebView.SetSurface(m_Surface.JavaObject);
-                m_WebView.LoadUrl("https://www.bilibili.com");
+                m_WebView.LoadUrl("https://www.google.com");
             });
         }
 
