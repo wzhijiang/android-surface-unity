@@ -10,7 +10,8 @@ namespace Igw.Android
 
         public ExternalTexture(Handler handler, int width, int height)
         {
-            m_JavaObject = new AndroidJavaObject("io.github.wzhijiang.android.surface.ExternalTexture", handler.JavaObject, width, height);
+            AndroidJavaObject jHandler = handler != null ? handler.JavaObject : null;
+            m_JavaObject = new AndroidJavaObject("io.github.wzhijiang.android.surface.ExternalTexture", jHandler, width, height);
         }
 
         public AndroidJavaObject GetSurfaceTexture()

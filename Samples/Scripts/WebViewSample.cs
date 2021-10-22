@@ -37,7 +37,7 @@ namespace Igw.Samples
             {
                 m_WebView = new SimpleWebView(Activity.CurrentActivity, Activity.UnityPlayer.JavaObject, 1920, 1080);
                 m_WebView.SetSurface(m_Surface.JavaObject);
-                m_WebView.LoadUrl("https://www.google.com");
+                m_WebView.LoadUrl("https://www.bilibili.com");
             });
         }
 
@@ -48,7 +48,7 @@ namespace Igw.Samples
 
         void InitSurface(int width, int height)
         {
-            m_ExternalTexture = new ExternalTexture(m_Handler, width, height);
+            m_ExternalTexture = new ExternalTexture(null, width, height);
             m_Surface = new Surface(m_ExternalTexture.GetSurfaceTexture());
 
             int textureId = m_ExternalTexture.GetTextureId();
