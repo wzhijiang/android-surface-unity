@@ -1,17 +1,15 @@
 ﻿using Igw.Android;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Igw.Samples
 {
-#if UNITY_EDITOR
-    using ExternalTexture = MockExternalTexture;
-#endif
-
     public class WebViewSample : MonoBehaviour
     {
+        public const int SURFACE_WIDTH = 1920;
+        public const int SURFACE_HEIGHT = 1080;
+        
         [SerializeField]
         private Renderer m_Renderer;
         [SerializeField]
@@ -28,14 +26,21 @@ namespace Igw.Samples
 
         IEnumerator Start()
         {
+#if UNITY_EDITOR
+            m_Handler = new Handler();
+#else
             m_Handler = new Handler(Activity.GetMainLooper());
+#endif
             m_TouchDetector.onTouch += OnTouch;
 
-            InitSurface(1920, 1080);
+            m_ExternalTexture = new ExternalTexture(null, SURFACE_WIDTH, SURFACE_HEIGHT);
+            yield return m_ExternalTexture.WaitForInitialized();
+
+            InitSurface(SURFACE_WIDTH, SURFACE_HEIGHT);
 
             yield return m_Handler.PostAsync(() =>
             {
-                m_WebView = new SimpleWebView(Activity.CurrentActivity, Activity.UnityPlayer.JavaObject, 1920, 1080);
+                m_WebView = new SimpleWebView(Activity.CurrentActivity, Activity.UnityPlayer.JavaObject, SURFACE_WIDTH, SURFACE_HEIGHT);
                 m_WebView.SetSurface(m_Surface.JavaObject);
                 m_WebView.LoadUrl("https://www.google.com");
             });
@@ -43,15 +48,23 @@ namespace Igw.Samples
 
         void Update()
         {
-            m_ExternalTexture.UpdateTexture();
+            if (m_ExternalTexture != null)
+            {
+                m_ExternalTexture.UpdateTexture();
+            }
         }
 
         void InitSurface(int width, int height)
         {
-            m_ExternalTexture = new ExternalTexture(null, width, height);
             m_Surface = new Surface(m_ExternalTexture.GetSurfaceTexture());
 
             int textureId = m_ExternalTexture.GetTextureId();
+            if (textureId == 0)
+            {
+                Debug.LogErrorFormat("Texture create failed: {0}", textureId);
+                return;
+            }
+
             Debug.LogFormat("Texture created: {0}", textureId);
 
             m_Texture = Texture2D.CreateExternalTexture(width, height, TextureFormat.RGBA32, false, true, (IntPtr)textureId);

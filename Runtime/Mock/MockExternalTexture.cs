@@ -18,7 +18,7 @@ namespace Igw.Android
 
         public int GetTextureId()
         {
-            return 1;
+            return 0;
         }
 
         public bool UpdateTexture()

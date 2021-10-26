@@ -51,30 +51,24 @@ namespace Igw.Android
 
             private void Start()
             {
-                try
-                {
 #if UNITY_EDITOR
-                    Execute();
+                Execute();
 #else
-                    Debug.Log("Handler PostAsync start");
-                    m_Host.Post(Execute);
+                m_Host.Post(Execute);
 #endif
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("Handler exception " + e.ToString());
-                    if (m_ThrowIfExceptional)
-                    {
-                        throw e;
-                    }
-
-                    this.Exception = e;                    
-                }
             }
 
             private void Execute()
             {
-                m_Action.Invoke();
+                try
+                {
+                    m_Action.Invoke();
+                }
+                catch (Exception e)
+                {
+                    this.Exception = e;
+                }
+
                 m_IsDone = true;
             }
 
@@ -84,6 +78,11 @@ namespace Igw.Android
                 {
                     if (this.Exception != null)
                     {
+                        if (m_ThrowIfExceptional)
+                        {
+                            throw this.Exception;
+                        }
+
                         return false;
                     }
 
