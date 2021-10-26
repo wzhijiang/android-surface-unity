@@ -26,5 +26,10 @@ namespace Igw.Android
         {
             return JavaClass.CallStatic<AndroidJavaObject>("getMainLooper");
         }
+
+        public static void Prepare()
+        {
+            JavaClass.CallStatic("prepare");
+        }
     }
 }

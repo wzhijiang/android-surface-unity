@@ -26,15 +26,14 @@ namespace Igw.Samples
 
         IEnumerator Start()
         {
-            m_Handler = new Handler(Looper.GetMainLooper());
-
             m_TouchDetector.onTouch += OnTouch;
 
-            m_ExternalTexture = new ExternalTexture(null, SURFACE_WIDTH, SURFACE_HEIGHT);
+            m_ExternalTexture = new ExternalTexture(SURFACE_WIDTH, SURFACE_HEIGHT);
             yield return m_ExternalTexture.WaitForInitialized();
 
             InitSurface(SURFACE_WIDTH, SURFACE_HEIGHT);
 
+            m_Handler = new Handler(Looper.GetMainLooper());
             yield return m_Handler.PostAsync(() =>
             {
                 m_WebView = new SimpleWebView(UnityPlayerActivity.CurrentActivity, UnityPlayerActivity.UnityPlayer.JavaObject, SURFACE_WIDTH, SURFACE_HEIGHT);
@@ -70,10 +69,13 @@ namespace Igw.Samples
 
         void OnTouch(Vector2 point, int action)
         {
-            m_Handler.Post(() =>
+            if (m_Handler != null)
             {
-                m_WebView.DispatchTouchEvent((int)(m_WebView.GetWidth() * point.x), (int)(m_WebView.GetHeight() * point.y), action);
-            });
+                m_Handler.Post(() =>
+                {
+                    m_WebView.DispatchTouchEvent((int)(m_WebView.GetWidth() * point.x), (int)(m_WebView.GetHeight() * point.y), action);
+                });
+            }
         }
     }
 }

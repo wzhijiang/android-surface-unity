@@ -12,7 +12,20 @@ namespace Igw.Android
         private ExternalTextureInternal m_Internal;
         private int m_ID = GenerateID();
 
+        private Handler m_Handler;
+
+        public ExternalTexture(int width, int height)
+        {
+            Handler handler = new Handler(Looper.MyLooper());
+            Init(handler, width, height);
+        }
+
         public ExternalTexture(Handler handler, int width, int height)
+        {
+            Init(handler, width, height);
+        }
+
+        private void Init(Handler handler, int width, int height)
         {
             PostToRenderThread(() =>
             {
