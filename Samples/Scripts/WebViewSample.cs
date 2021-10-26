@@ -40,7 +40,7 @@ namespace Igw.Samples
 
             yield return m_Handler.PostAsync(() =>
             {
-                m_WebView = new SimpleWebView(Activity.CurrentActivity, Activity.UnityPlayer.JavaObject, SURFACE_WIDTH, SURFACE_HEIGHT);
+                m_WebView = new SimpleWebView(UnityPlayerActivity.CurrentActivity, UnityPlayerActivity.UnityPlayer.JavaObject, SURFACE_WIDTH, SURFACE_HEIGHT);
                 m_WebView.SetSurface(m_Surface.JavaObject);
                 m_WebView.LoadUrl("https://www.google.com");
             });

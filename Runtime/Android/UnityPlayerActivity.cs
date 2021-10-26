@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Igw.Android
 {
-    public class Activity
+    public class UnityPlayerActivity
     {
         public const string UNITY_ACTIVITY_CLASS = "com.unity3d.player.UnityPlayer";
 
