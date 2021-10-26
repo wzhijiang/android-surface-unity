@@ -26,11 +26,8 @@ namespace Igw.Samples
 
         IEnumerator Start()
         {
-#if UNITY_EDITOR
-            m_Handler = new Handler();
-#else
-            m_Handler = new Handler(Activity.GetMainLooper());
-#endif
+            m_Handler = new Handler(Looper.GetMainLooper());
+
             m_TouchDetector.onTouch += OnTouch;
 
             m_ExternalTexture = new ExternalTexture(null, SURFACE_WIDTH, SURFACE_HEIGHT);

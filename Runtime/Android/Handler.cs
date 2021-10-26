@@ -11,12 +11,12 @@ namespace Igw.Android
             get { return m_JavaObject; }
         }
 
-        public Handler()
+        public Handler(AndroidJavaObject jLooper)
         {
-            m_JavaObject = new AndroidJavaObject("android.os.Handler");
+            Init(jLooper);
         }
 
-        public Handler(AndroidJavaObject jLooper)
+        private void Init(AndroidJavaObject jLooper)
         {
             m_JavaObject = new AndroidJavaObject("android.os.Handler", jLooper);
         }
