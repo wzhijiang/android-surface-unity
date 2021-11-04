@@ -1,9 +1,4 @@
-﻿using AOT;
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Runtime.InteropServices;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Igw.Android
 {

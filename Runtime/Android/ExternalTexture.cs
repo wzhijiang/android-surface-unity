@@ -1,6 +1,5 @@
 ﻿using AOT;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -10,9 +9,9 @@ namespace Igw.Android
     public class ExternalTexture
     {
         private ExternalTextureInternal m_Internal;
-        private int m_ID = GenerateID();
+        private int m_ID;
 
-        private Handler m_Handler;
+        private bool m_IsReleased;
 
         public ExternalTexture(int width, int height)
         {
@@ -40,22 +39,34 @@ namespace Igw.Android
 
         public WaitUntil WaitForInitialized()
         {
-            return new WaitUntil(() => m_ID > 0);
+            return new WaitUntil(() => IsValid());
         }
 
         public AndroidJavaObject GetSurfaceTexture()
         {
+            if (!IsValid())
+            {
+                Debug.LogError("The external texture is invalid.");
+                return null;
+            }
+
             return m_Internal.GetSurfaceTexture();
         }
 
         public int GetTextureId()
         {
+            if (!IsValid())
+            {
+                Debug.LogError("The external texture is invalid.");
+                return 0;
+            }
+
             return m_Internal.GetTextureId();
         }
 
         public void UpdateTexture()
         {
-            if (m_ID > 0)
+            if (IsValid())
             {
                 GL.IssuePluginEvent(s_RenderThreadHandlePtr, ConstructEventID(OP_EXTRENAL_TEXTURE_UPDATE, m_ID));
             }
@@ -69,16 +80,35 @@ namespace Igw.Android
 
         public void Release()
         {
-            GL.IssuePluginEvent(s_RenderThreadHandlePtr, ConstructEventID(OP_EXTERNAL_TEXTURE_RELEASE, m_ID));
+            if (!IsValid())
+            {
+                Debug.LogError("The external texture is invalid.");
+                return;
+            }
+
+            m_IsReleased = true;
+
+            PostToRenderThread(() =>
+            {
+                ExternalTextureInternal i;
+                if (s_ExternalTextureInternalMap.TryRemove(m_ID, out i))
+                {
+                    i.Release();
+                }
+            });
+        }
+
+        private bool IsValid()
+        {
+            return m_ID > 0 && !m_IsReleased;
         }
 
         private delegate void RenderEventDelegate(int eventID);
         private static RenderEventDelegate s_RenderThreadHandle = new RenderEventDelegate(RunOnRenderThread);
         private static IntPtr s_RenderThreadHandlePtr = Marshal.GetFunctionPointerForDelegate(s_RenderThreadHandle);
 
-        public const int OP_EXECUTE_ON_RENDER_THREAD = 2;
-        public const int OP_EXTRENAL_TEXTURE_UPDATE = 3;
-        public const int OP_EXTERNAL_TEXTURE_RELEASE = 4;
+        public const int OP_EXECUTE_ON_RENDER_THREAD = 1;
+        public const int OP_EXTRENAL_TEXTURE_UPDATE = 2;
 
         private static ConcurrentQueue<Action> s_ExecutionQueue = new ConcurrentQueue<Action>();
         private static ConcurrentDictionary<int, ExternalTextureInternal> s_ExternalTextureInternalMap = new ConcurrentDictionary<int, ExternalTextureInternal>();
@@ -93,7 +123,7 @@ namespace Igw.Android
             {
                 case OP_EXECUTE_ON_RENDER_THREAD:
                     {
-                        Action a = null;
+                        Action a;
                         if (s_ExecutionQueue.TryDequeue(out a))
                         {
                             a.Invoke();
@@ -106,15 +136,6 @@ namespace Igw.Android
                         if (s_ExternalTextureInternalMap.TryGetValue(externalTextureID, out i))
                         {
                             i.UpdateTexture();
-                        }
-                    }
-                    break;
-                case OP_EXTERNAL_TEXTURE_RELEASE:
-                    {
-                        ExternalTextureInternal i;
-                        if (s_ExternalTextureInternalMap.TryRemove(externalTextureID, out i))
-                        {
-                            i.Release();
                         }
                     }
                     break;
